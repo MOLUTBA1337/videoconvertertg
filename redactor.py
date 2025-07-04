@@ -1,11 +1,11 @@
 from moviepy import VideoFileClip
 from moviepy.video.fx.Crop import Crop
 import os
-import asyncio
+
 def redact_video(id):
     input_filename1 = f"media/{id}_input_video.mp4"
     file_size = os.path.getsize(input_filename1)
-    print(file_size)
+
     if file_size/(2**20) > 20:
         return '<b>К сожалению телеграмм может скачивать файлы не более 20мб.</b>'
 
@@ -18,12 +18,13 @@ def redact_video(id):
 
         max_duration = 56
         if clip.duration >= max_duration:
-            clip = clip.subclip(0, max_duration)
+            clip = clip.subclipped(0, max_duration)
 
 
         size = min(clip.w, clip.h)
         x_center = clip.w / 2
         y_center = clip.h / 2
+
         obrclip = Crop(
             x_center=x_center,
             y_center=y_center,
