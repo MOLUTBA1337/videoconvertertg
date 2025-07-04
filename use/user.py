@@ -33,11 +33,9 @@ async def main_menu(call: CallbackQuery,state:FSMContext):
 
 @router.callback_query(F.data=='profile')
 async def profile(call: CallbackQuery):
-    count = Users(call.from_user.id).return_count()
     await call.message.delete()
-    name = await bot.get_me()
 
-    text = f'<b>👤 Пользователь:</b> @{call.from_user.username} (ID: {call.from_user.id})\n<b>📦 Количество конвертов:</b> {count[0]}\n\n🎁 Пригласите друга 🤝 и получите <b>1 конвертацию без рекламы!</b> 🎉\nили воспользуйтесь <b>оплатой</b> 💳 для получения конвертаций без рекламы: <b>✨ 1 конвертация — 15 рублей!\n\nРеф ссылка: https://t.me/{name.username}?start={call.from_user.id}</b>'
+    text = f'<b>👤 Пользователь:</b> @{call.from_user.username} (ID: {call.from_user.id})'
     await call.message.answer(text=text)
 
 
