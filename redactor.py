@@ -2,7 +2,7 @@ from moviepy import VideoFileClip
 from moviepy.video.fx.Crop import Crop
 import os
 import asyncio
-async def redact_video(id):
+def redact_video(id):
     input_filename1 = f"media/{id}_input_video.mp4"
     file_size = os.path.getsize(input_filename1)
     print(file_size)
@@ -19,7 +19,7 @@ async def redact_video(id):
         max_duration = 56
         if clip.duration >= max_duration:
             clip = clip.subclip(0, max_duration)
-        await asyncio.sleep(0.1)
+
 
         size = min(clip.w, clip.h)
         x_center = clip.w / 2
@@ -31,7 +31,7 @@ async def redact_video(id):
             height=size
         )
         clip = obrclip.apply(clip)
-        await asyncio.sleep(0.1)
+
 
         clip = clip.resized((384, 384))
 

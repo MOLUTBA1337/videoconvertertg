@@ -5,7 +5,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from buttons.button import adm_panels
 from config import admins,bot
-from database.db import Users,Promo
+from database.db import Users
 import asyncio
 class Spam(StatesGroup):
     q1 = State()

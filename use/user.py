@@ -5,20 +5,20 @@ from aiogram import Router, F
 from aiogram.filters import Command,CommandObject
 from aiogram.types import Message,CallbackQuery,FSInputFile
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import StatesGroup, State
 from database.db import Users
 from config import bot
 import os
-from buttons.button import main_buttons,main_menuss
-
+from buttons.button import main_buttons
+from concurrent.futures import ProcessPoolExecutor
 from redactor import redact_video
-class Amount(StatesGroup):
-    q1 = State()
+
+process_pool = ProcessPoolExecutor(max_workers=2)
+
 
 router = Router()
 
 @router.message(Command("start"))
-async def cmd_start(message: Message,command: CommandObject,state: FSMContext):
+async def cmd_start(message: Message):
     text = '<b>Привет! 👋\n\nДобро пожаловать в наш видеоконвертер! Этот бот поможет вам легко конвертировать ваши видео в видео-заметки. 📹✨\n\nПросто отправьте мне видео, и я преобразую его в видео-заметку, которую вы сможете использовать в чате. Начните сейчас и наслаждайтесь простотой конвертации!</b>'
     Users(message.from_user.id).add_user()
     await message.answer(text=text,reply_markup=main_buttons())
@@ -59,11 +59,13 @@ async def convert(message: Message):
         second = await bot.edit_message_text(text='<b>Видео скачивается!</b>',message_id=first.message_id,chat_id=message.from_user.id)
         await bot.download_file(file_path.file_path, destination=f"media/{message.from_user.id}_input_video.mp4",timeout=60)
         third = await bot.edit_message_text('<b>Видео обрабатывается!</b>',message_id=second.message_id,chat_id=message.from_user.id)
-        asyncio.create_task(redact_video(message.from_user.id))
+
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(process_pool, redact_video, message.from_user.id)
 
         document = FSInputFile(f"media/{message.from_user.id}_output_video.mp4")
         await bot.delete_message(message_id=third.message_id,chat_id=message.from_user.id)
-        Users(message.from_user.id).minus_count(1)
+
         await bot.send_video_note(message.from_user.id,video_note=document)
 
         if os.path.exists(f"media/{message.from_user.id}_input_video.mp4"):
