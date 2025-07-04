@@ -10,3 +10,6 @@ token = os.getenv("TOKEN")
 
 dp = Dispatcher()
 bot = Bot(token=token,default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+
+
+current_proccess = []

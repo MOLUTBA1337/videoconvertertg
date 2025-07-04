@@ -1,8 +1,7 @@
 import asyncio
-import math
 from tiktokdownloader import video
 from aiogram import Router, F
-from aiogram.filters import Command,CommandObject
+from aiogram.filters import Command
 from aiogram.types import Message,CallbackQuery,FSInputFile
 from aiogram.fsm.context import FSMContext
 from database.db import Users
@@ -11,8 +10,9 @@ import os
 from buttons.button import main_buttons
 from concurrent.futures import ProcessPoolExecutor
 from redactor import redact_video
+import config
 
-process_pool = ProcessPoolExecutor(max_workers=2)
+process_pool = ProcessPoolExecutor(max_workers=10)
 
 
 router = Router()
@@ -52,6 +52,12 @@ async def convert(message: Message):
             await message.answer('<b>К сожалению телеграмм может скачивать файлы не более 20мб.\nИзмените качество для конвертации</b>')
             return
 
+        if message.from_user.id in config.current_proccess:
+            await message.answer(
+                '<b>Ваше видео конвертируется! Прежде чем сконвертировать новое видео, дождитесь текущего!</b>')
+            return
+
+        config.current_proccess.append(message.from_user.id)
 
         first = await message.reply('<b>Это займет некоторое время!</b>')
 
@@ -72,6 +78,7 @@ async def convert(message: Message):
             os.remove(f"media/{message.from_user.id}_input_video.mp4")
         if os.path.exists(f"media/{message.from_user.id}_output_video.mp4"):
             os.remove(f"media/{message.from_user.id}_output_video.mp4")
+        config.current_proccess.remove(message.from_user.id)
 
 
 
