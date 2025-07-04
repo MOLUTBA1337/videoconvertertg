@@ -59,7 +59,7 @@ async def convert(message: Message):
         second = await bot.edit_message_text(text='<b>Видео скачивается!</b>',message_id=first.message_id,chat_id=message.from_user.id)
         await bot.download_file(file_path.file_path, destination=f"media/{message.from_user.id}_input_video.mp4",timeout=60)
         third = await bot.edit_message_text('<b>Видео обрабатывается!</b>',message_id=second.message_id,chat_id=message.from_user.id)
-        redact_video(message.from_user.id)
+        asyncio.create_task(redact_video(message.from_user.id))
 
         document = FSInputFile(f"media/{message.from_user.id}_output_video.mp4")
         await bot.delete_message(message_id=third.message_id,chat_id=message.from_user.id)
