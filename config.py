@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
-admins = os.getenv("ADMIN")
+admins = list(map(int,os.getenv("ADMIN").split(",")))
 token = os.getenv("TOKEN")
 
 dp = Dispatcher()
