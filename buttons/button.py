@@ -11,7 +11,7 @@ def main_buttons():
 
         ],
         [
-            types.InlineKeyboardButton(text="🆘 Support", url="https://t.me/softstocksupport")
+            types.InlineKeyboardButton(text="🆘 Support", url="https://t.me/MOLUTBA")
         ]
     ]
 
