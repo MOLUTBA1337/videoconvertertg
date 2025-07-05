@@ -16,7 +16,7 @@ def redact_video(id):
 
         clip = VideoFileClip(input_filename)
 
-        max_duration = 56
+        max_duration = 60
         if clip.duration >= max_duration:
             clip = clip.subclipped(0, max_duration)
 

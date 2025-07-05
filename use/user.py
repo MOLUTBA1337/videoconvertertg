@@ -7,7 +7,7 @@ from aiogram.fsm.context import FSMContext
 from database.db import Users
 from config import bot
 import os
-from buttons.button import main_buttons
+from buttons.button import main_buttons,agree
 from concurrent.futures import ProcessPoolExecutor
 from redactor import redact_video
 import config
@@ -88,16 +88,20 @@ async def convert(message: Message):
 @router.message(F.text.startswith('www.tiktok.com'))
 async def tiktok(message: Message):
     link = message.text
+    first = await message.answer("Скачиваю видео!")
     video_status = await download_video(message.from_user.id,link)
     if video_status is not None:
-        await message.answer(video_status)
-    else:
-        name = f"media/{message.from_user.id}_output_video.mp4"
-        document = FSInputFile(name)
+        await bot.edit_message_text(text=video_status,message_id=first.message_id,
+                                    chat_id=message.from_user.id)
+        return
 
-        await message.answer_video(document)
-        if os.path.exists(f"media/{message.from_user.id}_output_video.mp4"):
-            os.remove(f"media/{message.from_user.id}_output_video.mp4")
+    else:
+        name = f"media/{message.from_user.id}_input_video.mp4"
+        document = FSInputFile(name)
+        await bot.delete_message(message_id=first.message_id, chat_id=message.from_user.id)
+        await message.answer_video(document,caption="Хотите сконвертировать в видеокружок?",reply_markup=agree())
+        #if os.path.exists(f"media/{message.from_user.id}_output_video.mp4"):
+        #    os.remove(f"media/{message.from_user.id}_output_video.mp4")
         """os.rename(f"media/{message.from_user.id}_tiktok.mp4",f"media/{message.from_user.id}_input_video.mp4")
         check = redact_video(message.from_user.id)
         if check is None:
@@ -109,7 +113,39 @@ async def tiktok(message: Message):
 
 
 
+@router.callback_query(F.data=='no')
+async def profile(call: CallbackQuery):
+    await call.message.delete()
+
+    if os.path.exists(f"media/{call.message.from_user.id}_output_video.mp4"):
+        os.remove(f"media/{call.message.from_user.id}_output_video.mp4")
+
+@router.callback_query(F.data=='yes')
+async def profile(call: CallbackQuery):
+    await call.message.delete()
+
+    if call.message.from_user.id in config.current_proccess:
+        await call.message.answer(
+            '<b>Ваше видео конвертируется! Прежде чем сконвертировать новое видео, дождитесь текущего!</b>')
+        return
+
+    config.current_proccess.append(call.message.from_user.id)
+
+    await call.message.answer("Конвертирую в видеокружок!")
+
+    loop = asyncio.get_event_loop()
+    await loop.run_in_executor(process_pool, redact_video, call.message.from_user.id)
+
+    document = FSInputFile(f"media/{call.message.from_user.id}_output_video.mp4")
+    await call.message.delete()
+
+    await bot.send_video_note(call.message.from_user.id, video_note=document)
 
 
+    if os.path.exists(f"media/{call.message.from_user.id}_input_video.mp4"):
+        os.remove(f"media/{call.message.from_user.id}_input_video.mp4")
+    if os.path.exists(f"media/{call.message.from_user.id}_output_video.mp4"):
+        os.remove(f"media/{call.message.from_user.id}_output_video.mp4")
 
+    config.current_proccess.remove(call.message.from_user.id)
 

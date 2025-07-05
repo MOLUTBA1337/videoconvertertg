@@ -69,5 +69,17 @@ def adm_panels():
     )
     return adm_panel
 
+def agree():
+    main = [
 
+        [
+            types.InlineKeyboardButton(text="да", callback_data="yes"),
+            types.InlineKeyboardButton(text="нет", callback_data="no")
+
+        ],
+
+    ]
+
+    main_menus = types.InlineKeyboardMarkup(inline_keyboard=main)
+    return main_menus
 

@@ -121,7 +121,7 @@ async def download_video(id, link):
 
         # Step 6: Write file asynchronously
         os.makedirs("media", exist_ok=True)
-        file_path = f"media/{id}_output_video.mp4"
+        file_path = f"media/{id}_input_video.mp4"
 
         try:
             async with aiofiles.open(file_path, "wb") as f:
