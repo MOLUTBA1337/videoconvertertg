@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
-admins = 6328214493
-token = "7771933584:AAGfPrcuvTAY44e6_m4LWGBwtAN8Cvil5e0"
+admins = list(map(int,os.getenv("ADMIN").split(",")))
+token = os.getenv("TOKEN")
 
 dp = Dispatcher()
 bot = Bot(token=token,default=DefaultBotProperties(parse_mode=ParseMode.HTML))
