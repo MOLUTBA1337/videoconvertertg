@@ -92,7 +92,7 @@ async def tiktok(message: Message):
     if video_status is not None:
         await message.answer(video_status)
     else:
-        name = f"media/{message.from_user.id}_tiktok.mp4"
+        name = f"media/{message.from_user.id}_output_video.mp4"
         document = FSInputFile(name)
 
         await message.answer_video(document)
