@@ -95,7 +95,6 @@ async def download_video(id, link):
         try:
             async with session.post(first_link, headers=headers, json=json_data) as post_response:
                 if post_response.status != 200:
-                    print(await post_response.text())
                     return "<b>Ошибка получения HTML для загрузки видео.</b>"
                 post_json = await post_response.json()
         except (aiohttp.ClientError, ValueError) as e:

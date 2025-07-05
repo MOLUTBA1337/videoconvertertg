@@ -1,5 +1,5 @@
 import asyncio
-from tiktokdownloader import video, download_video
+from tiktokdownloader import download_video
 from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram.types import Message,CallbackQuery,FSInputFile
