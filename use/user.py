@@ -1,5 +1,5 @@
 import asyncio
-from tiktokdownloader import video
+from tiktokdownloader import video, download_video
 from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram.types import Message,CallbackQuery,FSInputFile
@@ -88,23 +88,24 @@ async def convert(message: Message):
 @router.message(F.text.startswith('www.tiktok.com'))
 async def tiktok(message: Message):
     link = message.text
-    video_status = video(message.from_user.id,link)
-    if video_status != "Видео успешно скачано!":
+    video_status = await download_video(message.from_user.id,link)
+    if video_status is not None:
         await message.answer(video_status)
     else:
         name = f"media/{message.from_user.id}_tiktok.mp4"
         document = FSInputFile(name)
 
         await message.answer_video(document)
-        os.rename(f"media/{message.from_user.id}_tiktok.mp4",f"media/{message.from_user.id}_input_video.mp4")
+        if os.path.exists(f"media/{message.from_user.id}_output_video.mp4"):
+            os.remove(f"media/{message.from_user.id}_output_video.mp4")
+        """os.rename(f"media/{message.from_user.id}_tiktok.mp4",f"media/{message.from_user.id}_input_video.mp4")
         check = redact_video(message.from_user.id)
         if check is None:
             document = FSInputFile(f"media/{message.from_user.id}_input_video.mp4")
             await message.answer_video_note(document)
-            if os.path.exists(f"media/{message.from_user.id}_input_video.mp4"):
-                os.remove(f"media/{message.from_user.id}_input_video.mp4")
+
             if os.path.exists(f"media/{message.from_user.id}_output_video.mp4"):
-                os.remove(f"media/{message.from_user.id}_output_video.mp4")
+                os.remove(f"media/{message.from_user.id}_output_video.mp4")"""
 
 
 
