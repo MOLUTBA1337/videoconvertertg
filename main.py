@@ -19,8 +19,14 @@ def run():
 
 
 def keep_alive():
+    for filename in os.listdir("media"):
+        if filename.endswith(".mp4"):
+            file_path = os.path.join("media", filename)
+            os.remove(file_path)
     server = threading.Thread(target=run)
     server.start()
+
+
 
 
 async def main():

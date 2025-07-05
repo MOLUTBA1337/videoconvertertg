@@ -117,35 +117,36 @@ async def tiktok(message: Message):
 async def profile(call: CallbackQuery):
     await call.message.delete()
 
-    if os.path.exists(f"media/{call.message.from_user.id}_output_video.mp4"):
-        os.remove(f"media/{call.message.from_user.id}_output_video.mp4")
+    if os.path.exists(f"media/{call.from_user.id}_output_video.mp4"):
+        os.remove(f"media/{call.from_user.id}_output_video.mp4")
 
 @router.callback_query(F.data=='yes')
 async def profile(call: CallbackQuery):
     await call.message.delete()
 
-    if call.message.from_user.id in config.current_proccess:
+    if call.from_user.id in config.current_proccess:
         await call.message.answer(
             '<b>Ваше видео конвертируется! Прежде чем сконвертировать новое видео, дождитесь текущего!</b>')
         return
 
-    config.current_proccess.append(call.message.from_user.id)
+    config.current_proccess.append(call.from_user.id)
 
-    await call.message.answer("Конвертирую в видеокружок!")
+    first = await call.message.answer("Конвертирую в видеокружок!")
 
     loop = asyncio.get_event_loop()
-    await loop.run_in_executor(process_pool, redact_video, call.message.from_user.id)
+    await loop.run_in_executor(process_pool, redact_video, call.from_user.id)
 
-    document = FSInputFile(f"media/{call.message.from_user.id}_output_video.mp4")
-    await call.message.delete()
+    document = FSInputFile(f"media/{call.from_user.id}_output_video.mp4")
 
-    await bot.send_video_note(call.message.from_user.id, video_note=document)
+    await bot.delete_message(chat_id=first.chat.id, message_id=first.message_id)
+
+    await bot.send_video_note(call.from_user.id, video_note=document)
 
 
-    if os.path.exists(f"media/{call.message.from_user.id}_input_video.mp4"):
-        os.remove(f"media/{call.message.from_user.id}_input_video.mp4")
-    if os.path.exists(f"media/{call.message.from_user.id}_output_video.mp4"):
-        os.remove(f"media/{call.message.from_user.id}_output_video.mp4")
+    if os.path.exists(f"media/{call.from_user.id}_input_video.mp4"):
+        os.remove(f"media/{call.from_user.id}_input_video.mp4")
+    if os.path.exists(f"media/{call.from_user.id}_output_video.mp4"):
+        os.remove(f"media/{call.from_user.id}_output_video.mp4")
 
-    config.current_proccess.remove(call.message.from_user.id)
+    config.current_proccess.remove(call.from_user.id)
 
